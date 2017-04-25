@@ -13,14 +13,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.lee.hansol.finalpopularmovies.adapters.MovieListAdapter;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.PopularMoviesAsyncTaskLoader;
+import com.lee.hansol.finalpopularmovies.asynctaskloaders.RatingMoviesAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityMainBinding;
 import com.lee.hansol.finalpopularmovies.models.Movie;
 
-import static android.R.attr.ordering;
 import static com.lee.hansol.finalpopularmovies.utils.ToastUtils.toast;
 
 public class MainActivity extends AppCompatActivity implements
@@ -31,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private final int GRID_COL_NUM = 2;
     private final int LOADER_ID_POPULAR_MOVIES_ONLINE = 125;
+    private final int LOADER_ID_RATING_MOVIES_ONLINE = 126;
     private final int ORDERING_BY_POPULARITY = 0;
     private final int ORDERING_BY_RATING = 1;
     private final int ORDERING_BY_FAVORITE = 2;
@@ -50,25 +50,27 @@ public class MainActivity extends AppCompatActivity implements
         mainLayout.activityMainRecyclerView.setLayoutManager(gridLayoutManager);
         recyclerViewAdapter = new MovieListAdapter(this);
         mainLayout.activityMainRecyclerView.setAdapter(recyclerViewAdapter);
-        if (ordering == ORDERING_BY_POPULARITY) fillWithPopularMovies();
-        else if (ordering == ORDERING_BY_RATING) fillWithRatingMovies();
-        else if (ordering == ORDERING_BY_FAVORITE) fillWithFavoriteMovies();
-        else {
-            throw new UnsupportedOperationException("Unknown ordering: " + ordering);
-        }
+        loadMovies();
     }
 
-    private void fillWithPopularMovies() {
+    private void loadMovies() {
+        if (ordering == ORDERING_BY_POPULARITY) loadPopularMovies();
+        else if (ordering == ORDERING_BY_RATING) loadRatingMovies();
+        else if (ordering == ORDERING_BY_FAVORITE) loadFavoriteMovies();
+        else { throw new UnsupportedOperationException("Unknown ordering: " + ordering); }
+    }
+
+    private void loadPopularMovies() {
         showOnlyProgressBar();
         getSupportLoaderManager().initLoader(LOADER_ID_POPULAR_MOVIES_ONLINE, null, this);
     }
 
-    private void fillWithRatingMovies() {
-        //TODO
-        throw new RuntimeException("Unimplemented");
+    private void loadRatingMovies() {
+        showOnlyProgressBar();
+        getSupportLoaderManager().initLoader(LOADER_ID_RATING_MOVIES_ONLINE, null, this);
     }
 
-    private void fillWithFavoriteMovies() {
+    private void loadFavoriteMovies() {
         //TODO
         throw new RuntimeException("Unimplemented");
     }
@@ -99,8 +101,11 @@ public class MainActivity extends AppCompatActivity implements
     public Loader<Movie[]> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID_POPULAR_MOVIES_ONLINE) {
             return new PopularMoviesAsyncTaskLoader(this);
+        } else if (id == LOADER_ID_RATING_MOVIES_ONLINE){
+            return new RatingMoviesAsyncTaskLoader(this);
         } else {
             throw new RuntimeException("unimplemented");
+
         }
     }
 
@@ -131,13 +136,24 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.activity_main_menu_popularity:
-                toast(this, "popularity"); break;
+                toast(this, "popularity");
+                ordering = ORDERING_BY_POPULARITY;
+                loadMovies();
+                break;
             case R.id.activity_main_menu_rating:
-                toast(this, "rating"); break;
+                toast(this, "rating");
+                ordering = ORDERING_BY_RATING;
+                loadMovies();
+                break;
             case R.id.activity_main_menu_favorite:
-                toast(this, "favorite"); break;
+                toast(this, "favorite");
+                ordering = ORDERING_BY_FAVORITE;
+                loadMovies();
+                break;
             case R.id.activity_main_menu_refresh:
-                toast(this, "refresh");break;
+                toast(this, "refresh");
+                loadMovies();
+                break;
             default: return super.onOptionsItemSelected(item);
         }
         return true;

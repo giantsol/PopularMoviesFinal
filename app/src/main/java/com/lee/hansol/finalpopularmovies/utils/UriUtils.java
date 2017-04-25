@@ -24,4 +24,18 @@ public class UriUtils {
         }
         return url;
     }
+
+    public static URL getRatingMoviesUrl(Context context) {
+        String myApiKey = context.getString(R.string.api_key);
+        Uri uri = Uri.parse(context.getString(R.string.url_base_rating)).buildUpon()
+                .appendQueryParameter(context.getString(R.string.url_param_api_key), myApiKey)
+                .build();
+        URL url = null;
+        try {
+            url = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
 }
