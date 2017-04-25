@@ -36,4 +36,9 @@ public class UriUtils {
         String baseUrl = String.format(context.getString(R.string.url_base_videos_with_id_holder), movieId);
         return getApiKeyAppendedUrl(context, baseUrl);
     }
+
+    public static URL getMovieReviewsUrl(Context context, int movieid) {
+        String baseUrl = String.format(context.getString(R.string.url_base_reviews_with_id_holder), movieid);
+        return getApiKeyAppendedUrl(context, baseUrl);
+    }
 }

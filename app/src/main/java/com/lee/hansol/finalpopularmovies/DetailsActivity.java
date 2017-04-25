@@ -5,30 +5,26 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieReviewsAsyncTaskLoader;
+import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieTrailersAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityDetailsBinding;
 import com.lee.hansol.finalpopularmovies.models.Movie;
-import com.lee.hansol.finalpopularmovies.utils.JSONUtils;
-import com.lee.hansol.finalpopularmovies.utils.NetworkUtils;
-import com.lee.hansol.finalpopularmovies.utils.UriUtils;
 import com.squareup.picasso.Picasso;
 
-import java.net.URL;
-
 public class DetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String[]>{
-    private Movie movie;
     private ActivityDetailsBinding layout;
-    private URL trailersUrl;
 
     private final int LOADER_LOAD_TRAILERS_ID = 156;
+    private final int LOADER_LOAD_REVIEWS_ID = 157;
+
+    private final String BUNDLE_MOVIE_ID_KEY = "movie-id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,22 +34,36 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private void initialize() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
-
-        Intent callingIntent = getIntent();
-        if (callingIntent != null && callingIntent.hasExtra(MainActivity.INTENT_EXTRA_MOVIE_OBJECT)) {
-            movie =  callingIntent.getParcelableExtra(MainActivity.INTENT_EXTRA_MOVIE_OBJECT);
-            fillContents();
-        } else {
-            showErrorView();
-        }
-
-        trailersUrl = UriUtils.getMovieTrailersUrl(this, movie.movieId);
-        getSupportLoaderManager().initLoader(LOADER_LOAD_TRAILERS_ID, null, this);
+        setupActionBar();
+        setupViewContents();
     }
 
-    private void fillContents() {
+    private void setupActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void setupViewContents() {
+        Intent callingIntent = getIntent();
+        if (receivedMovieObjectSuccessfullyFrom(callingIntent)) fillContentsWith(getMovieObjectFromIntent(callingIntent));
+        else showErrorView();
+    }
+
+    private boolean receivedMovieObjectSuccessfullyFrom(Intent callingIntent) {
+        return callingIntent != null && callingIntent.hasExtra(MainActivity.INTENT_EXTRA_MOVIE_OBJECT);
+    }
+
+    private Movie getMovieObjectFromIntent(Intent intent) {
+        return intent.getParcelableExtra(MainActivity.INTENT_EXTRA_MOVIE_OBJECT);
+    }
+
+    private void fillContentsWith(Movie movie) {
+        fillBasicContents(movie);
+        loadMovieTrailers(movie.movieId);
+        loadMovieReviews(movie.movieId);
+    }
+
+    private void fillBasicContents(Movie movie) {
         layout.activityDetailsContainer.setVisibility(View.VISIBLE);
         layout.activityDetailsErrorView.setVisibility(View.INVISIBLE);
         layout.activityDetailsTitle.setText(movie.title);
@@ -63,6 +73,18 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         layout.activityDetailsOverview.setText(movie.overview);
     }
 
+    private void loadMovieTrailers(int movieId) {
+        Bundle args = new Bundle();
+        args.putInt(BUNDLE_MOVIE_ID_KEY, movieId);
+        getSupportLoaderManager().initLoader(LOADER_LOAD_TRAILERS_ID, args, this);
+    }
+
+    private void loadMovieReviews(int movieId) {
+        Bundle args = new Bundle();
+        args.putInt(BUNDLE_MOVIE_ID_KEY, movieId);
+        getSupportLoaderManager().initLoader(LOADER_LOAD_REVIEWS_ID, args, this);
+    }
+
     private void showErrorView() {
         layout.activityDetailsContainer.setVisibility(View.INVISIBLE);
         layout.activityDetailsErrorView.setVisibility(View.VISIBLE);
@@ -70,53 +92,38 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public Loader<String[]> onCreateLoader(int id, Bundle args) {
+        int movieId = args.getInt(BUNDLE_MOVIE_ID_KEY);
+
         if (id == LOADER_LOAD_TRAILERS_ID) {
-            return new AsyncTaskLoader<String[]>(this) {
-                @Override
-                protected void onStartLoading() {
-                    forceLoad();
-                }
-
-                @Override
-                public String[] loadInBackground() {
-                    if (trailersUrl == null) return null;
-                    return loadTrailersFrom(trailersUrl);
-                }
-
-                private String[] loadTrailersFrom(URL url) {
-                    Log.d("hi", url.toString());
-                    String[] trailerKeys = null;
-                    try {
-                        String responseInJSON = NetworkUtils.getResponseFromHttpUrl(url);
-                        trailerKeys = JSONUtils.getTrailerKeysFromJson(responseInJSON);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return trailerKeys;
-                }
-            };
+            return new MovieTrailersAsyncTaskLoader(this, movieId);
+        } else if (id == LOADER_LOAD_REVIEWS_ID) {
+            return new MovieReviewsAsyncTaskLoader(this, movieId);
         } else {
-            throw new RuntimeException("unimplemented");
+            throw new UnsupportedOperationException("Unknown loader id: " + id);
         }
     }
 
     @Override
     public void onLoadFinished(Loader<String[]> loader, String[] data) {
         if (data ==null) return; //TODO: erase this line later
-        if (loader.getId() == LOADER_LOAD_TRAILERS_ID) {
+
+        int loaderId = loader.getId();
+        if (loaderId == LOADER_LOAD_TRAILERS_ID) {
             //TODO: data is an array of trailer keys. Use them to fill out Trailers UI
             //trailersAdapter.setDataAndRefresh(data); --> null check 안해도됨. Null이면 length가 0이되도록 설정.
             for (String trailerKey : data) {
                 Toast.makeText(this, trailerKey, Toast.LENGTH_SHORT).show();
             }
-        } else {
-            throw new RuntimeException("unimplemented");
+        } else if (loaderId == LOADER_LOAD_REVIEWS_ID){
+            for (String review : data) {
+                Toast.makeText(this, review, Toast.LENGTH_LONG).show();
+            }
         }
     }
 
     @Override
     public void onLoaderReset(Loader<String[]> loader) {
-
+        loader.cancelLoad();
     }
 
     @Override

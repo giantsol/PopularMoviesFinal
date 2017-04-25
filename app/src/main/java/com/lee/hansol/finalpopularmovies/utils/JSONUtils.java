@@ -48,7 +48,21 @@ public class JSONUtils {
             String trailerKey = videoJson.getString("key");
             trailerKeys.add(trailerKey);
         }
-        if (!trailerKeys.isEmpty()) return (String[]) trailerKeys.toArray(new String[0]);
+        if (!trailerKeys.isEmpty()) return trailerKeys.toArray(new String[0]);
         else return null;
+    }
+
+    public static String[] getMovieReviewsFromJson(String json) throws JSONException {
+        JSONObject root = new JSONObject(json);
+        JSONArray reviewJsons = root.getJSONArray("results");
+        ArrayList<String> reviews = new ArrayList<>();
+        for (int i = 0; i < reviewJsons.length(); i++) {
+            JSONObject reviewJson = reviewJsons.getJSONObject(i);
+            String review = reviewJson.getString("content");
+            reviews.add(review);
+        }
+        if (!reviews.isEmpty()) return reviews.toArray(new String[0]);
+        else return null;
+
     }
 }
