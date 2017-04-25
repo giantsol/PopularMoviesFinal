@@ -7,6 +7,7 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -108,7 +109,16 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
         else {
             recyclerViewAdapter.setMoviesAndRefresh(data);
             showMovieListView();
+            setActionBarTitleToCurrentOrdering();
         }
+    }
+
+    private void setActionBarTitleToCurrentOrdering() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) return;
+        if (ordering == BY_POPULARITY) actionBar.setTitle(getString(R.string.actionbar_title_popularity));
+        else if (ordering == BY_RATING) actionBar.setTitle(getString(R.string.actionbar_title_rating));
+        else if (ordering == BY_FAVORITE) actionBar.setTitle(getString(R.string.actionbar_title_favorite));
     }
 
     @Override
