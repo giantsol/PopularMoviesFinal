@@ -13,4 +13,9 @@
     <string name="api_key">96428e68824484b0ee6c775416584e0e</string>
 
     <string name="message_error_retrieving_movies">Error retrieving movies</string>
+
+    <string name="menu_title_popularity">Popularity</string>
+    <string name="menu_title_rating">Rating</string>
+    <string name="menu_title_favorite">Favorite</string>
+    <string name="menu_title_refresh">Refresh</string>
 </resources>
