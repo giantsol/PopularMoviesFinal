@@ -23,6 +23,10 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         layout = DataBindingUtil.setContentView(this, R.layout.activity_details);
+        initialize();
+    }
+
+    private void initialize() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
 

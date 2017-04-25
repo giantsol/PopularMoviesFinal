@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">FinalPopularMovies</string>
 
-    <string name="url_base_popularity">http://api.themoviedb.org/3/movie/top_rated</string>
-    <string name="url_base_rating">http://api.themoviedb.org/3/movie/popular</string>
+    <string name="url_base_popularity">http://api.themoviedb.org/3/movie/popular</string>
+    <string name="url_base_rating">http://api.themoviedb.org/3/movie/top_rated</string>
     <string name="url_base_videos_with_id_holder">https://api.themoviedb.org/3/movie/%s/videos</string>
     <string name="url_base_reviews_with_id_holder">https://api.themoviedb.org/3/movie/%s/reviews</string>
     <string name="url_base_youtube_video">https://www.youtube.com/watch</string>
