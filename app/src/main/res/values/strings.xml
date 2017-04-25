@@ -13,12 +13,14 @@
     <string name="api_key">96428e68824484b0ee6c775416584e0e</string>
 
     <string name="message_error_retrieving_movies">Error retrieving movies</string>
+    <string name="message_error_in_detail_view">Error getting the movie data object</string>
 
     <string name="menu_title_popularity">Popularity</string>
     <string name="menu_title_rating">Rating</string>
     <string name="menu_title_favorite">Favorite</string>
     <string name="menu_title_refresh">Refresh</string>
-    <string name="title_activity_details">DetailsActivity</string>
+
+    <string name="title_activity_details">Details</string>
 
     <string name="actionbar_title_popularity">Movies - By Popularity</string>
     <string name="actionbar_title_rating">Movies - By Rating</string>

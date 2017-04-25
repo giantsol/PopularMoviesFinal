@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.lee.hansol.finalpopularmovies.adapters.MovieListAdapter;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.PopularMoviesAsyncTaskLoader;
@@ -25,7 +26,7 @@ import com.lee.hansol.finalpopularmovies.models.Movie;
 import static com.lee.hansol.finalpopularmovies.utils.ToastUtils.toast;
 
 public class MainActivity extends AppCompatActivity implements MovieListAdapter.OnMovieItemClickListener, LoaderManager.LoaderCallbacks<Movie[]> {
-    private ActivityMainBinding mainLayout;
+    private ActivityMainBinding layout;
     private MovieListAdapter recyclerViewAdapter;
 
     private final int GRID_COL_NUM = 2;
@@ -34,24 +35,24 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     private final int BY_RATING = 152;
     private final int BY_FAVORITE = 153;
 
-    private final String INTENT_EXTRA_MOVIE_OBJECT = "movie-object";
+    public static final String INTENT_EXTRA_MOVIE_OBJECT = "movie-object";
 
-    //TODO: get last saved ordering and apply it to this variable
-    private int ordering = BY_POPULARITY;
+    //TODO: get last saved currentOrdering and apply it to this variable
+    private int currentOrdering = BY_POPULARITY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mainLayout = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        layout = DataBindingUtil.setContentView(this, R.layout.activity_main);
         initialize();
     }
 
     private void initialize() {
-        mainLayout.activityMainRecyclerView.setHasFixedSize(true);
+        layout.activityMainRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(this, GRID_COL_NUM, LinearLayoutManager.VERTICAL, false);
-        mainLayout.activityMainRecyclerView.setLayoutManager(gridLayoutManager);
+        layout.activityMainRecyclerView.setLayoutManager(gridLayoutManager);
         recyclerViewAdapter = new MovieListAdapter(this);
-        mainLayout.activityMainRecyclerView.setAdapter(recyclerViewAdapter);
+        layout.activityMainRecyclerView.setAdapter(recyclerViewAdapter);
         loadMovies();
     }
 
@@ -61,25 +62,25 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     private void startLoader() {
-        Loader<Movie[]> loader = getSupportLoaderManager().getLoader(ordering);
-        if (loader == null) getSupportLoaderManager().initLoader(ordering, null, this);
-        else getSupportLoaderManager().restartLoader(ordering, null, this);
+        Loader<Movie[]> loader = getSupportLoaderManager().getLoader(currentOrdering);
+        if (loader == null) getSupportLoaderManager().initLoader(currentOrdering, null, this);
+        else getSupportLoaderManager().restartLoader(currentOrdering, null, this);
     }
 
     private void showErrorMessage() {
-        mainLayout.activityMainProgressBar.setVisibility(View.INVISIBLE);
-        mainLayout.activityMainRecyclerView.setVisibility(View.INVISIBLE);
-        mainLayout.activityMainErrorView.setVisibility(View.VISIBLE);
+        layout.activityMainProgressBar.setVisibility(View.INVISIBLE);
+        layout.activityMainRecyclerView.setVisibility(View.INVISIBLE);
+        layout.activityMainErrorView.setVisibility(View.VISIBLE);
     }
     private void showOnlyProgressBar() {
-        mainLayout.activityMainRecyclerView.setVisibility(View.INVISIBLE);
-        mainLayout.activityMainErrorView.setVisibility(View.INVISIBLE);
-        mainLayout.activityMainProgressBar.setVisibility(View.VISIBLE);
+        layout.activityMainRecyclerView.setVisibility(View.INVISIBLE);
+        layout.activityMainErrorView.setVisibility(View.INVISIBLE);
+        layout.activityMainProgressBar.setVisibility(View.VISIBLE);
     }
     private void showMovieListView() {
-        mainLayout.activityMainRecyclerView.setVisibility(View.VISIBLE);
-        mainLayout.activityMainErrorView.setVisibility(View.INVISIBLE);
-        mainLayout.activityMainProgressBar.setVisibility(View.INVISIBLE);
+        layout.activityMainRecyclerView.setVisibility(View.VISIBLE);
+        layout.activityMainErrorView.setVisibility(View.INVISIBLE);
+        layout.activityMainProgressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -116,15 +117,14 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     private void setActionBarTitleToCurrentOrdering() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar == null) return;
-        if (ordering == BY_POPULARITY) actionBar.setTitle(getString(R.string.actionbar_title_popularity));
-        else if (ordering == BY_RATING) actionBar.setTitle(getString(R.string.actionbar_title_rating));
-        else if (ordering == BY_FAVORITE) actionBar.setTitle(getString(R.string.actionbar_title_favorite));
+        if (currentOrdering == BY_POPULARITY) actionBar.setTitle(getString(R.string.actionbar_title_popularity));
+        else if (currentOrdering == BY_RATING) actionBar.setTitle(getString(R.string.actionbar_title_rating));
+        else if (currentOrdering == BY_FAVORITE) actionBar.setTitle(getString(R.string.actionbar_title_favorite));
     }
 
     @Override
     public void onLoaderReset(Loader<Movie[]> loader) {
         loader.cancelLoad();
-        recyclerViewAdapter.setMoviesAndRefresh(null);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     private void reloadMoviesBy(int newOrdering) {
-        ordering = newOrdering;
+        currentOrdering = newOrdering;
         loadMovies();
     }
 
