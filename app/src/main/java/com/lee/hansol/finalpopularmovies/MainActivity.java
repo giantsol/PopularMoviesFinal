@@ -22,19 +22,21 @@ import com.lee.hansol.finalpopularmovies.models.Movie;
 
 import static com.lee.hansol.finalpopularmovies.utils.ToastUtils.toast;
 
-public class MainActivity extends AppCompatActivity implements
-        MovieListAdapter.OnMovieItemClickListener,
-        LoaderManager.LoaderCallbacks<Movie[]> {
+public class MainActivity extends AppCompatActivity implements MovieListAdapter.OnMovieItemClickListener, LoaderManager.LoaderCallbacks<Movie[]> {
     private ActivityMainBinding mainLayout;
     private MovieListAdapter recyclerViewAdapter;
 
     private final int GRID_COL_NUM = 2;
+
     private final int LOADER_ID_POPULAR_MOVIES_ONLINE = 125;
     private final int LOADER_ID_RATING_MOVIES_ONLINE = 126;
+    private final int LOADER_ID_FAVORITE_MOVIES_LOCAL = 127;
+
     private final int ORDERING_BY_POPULARITY = 0;
     private final int ORDERING_BY_RATING = 1;
     private final int ORDERING_BY_FAVORITE = 2;
 
+    //TODO: get last saved ordering and apply it to this variable
     private int ordering = ORDERING_BY_POPULARITY;
 
     @Override
@@ -54,25 +56,17 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void loadMovies() {
-        if (ordering == ORDERING_BY_POPULARITY) loadPopularMovies();
-        else if (ordering == ORDERING_BY_RATING) loadRatingMovies();
-        else if (ordering == ORDERING_BY_FAVORITE) loadFavoriteMovies();
+        showOnlyProgressBar();
+        if (ordering == ORDERING_BY_POPULARITY) startLoader(LOADER_ID_POPULAR_MOVIES_ONLINE);
+        else if (ordering == ORDERING_BY_RATING) startLoader(LOADER_ID_RATING_MOVIES_ONLINE);
+        else if (ordering == ORDERING_BY_FAVORITE) startLoader(LOADER_ID_FAVORITE_MOVIES_LOCAL);
         else { throw new UnsupportedOperationException("Unknown ordering: " + ordering); }
     }
 
-    private void loadPopularMovies() {
-        showOnlyProgressBar();
-        getSupportLoaderManager().initLoader(LOADER_ID_POPULAR_MOVIES_ONLINE, null, this);
-    }
-
-    private void loadRatingMovies() {
-        showOnlyProgressBar();
-        getSupportLoaderManager().initLoader(LOADER_ID_RATING_MOVIES_ONLINE, null, this);
-    }
-
-    private void loadFavoriteMovies() {
-        //TODO
-        throw new RuntimeException("Unimplemented");
+    private void startLoader(int loaderId) {
+        Loader<Movie[]> loader = getSupportLoaderManager().getLoader(loaderId);
+        if (loader == null) getSupportLoaderManager().initLoader(loaderId, null, this);
+        else getSupportLoaderManager().restartLoader(loaderId, null, this);
     }
 
     private void showErrorMessage() {
@@ -103,9 +97,11 @@ public class MainActivity extends AppCompatActivity implements
             return new PopularMoviesAsyncTaskLoader(this);
         } else if (id == LOADER_ID_RATING_MOVIES_ONLINE){
             return new RatingMoviesAsyncTaskLoader(this);
-        } else {
+        } else if (id == LOADER_ID_FAVORITE_MOVIES_LOCAL){
+            //TODO implement
             throw new RuntimeException("unimplemented");
-
+        } else {
+            throw new UnsupportedOperationException("Unknown loader id: " + id);
         }
     }
 
@@ -136,26 +132,21 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.activity_main_menu_popularity:
-                toast(this, "popularity");
-                ordering = ORDERING_BY_POPULARITY;
-                loadMovies();
-                break;
+                reloadMoviesBy(ORDERING_BY_POPULARITY); break;
             case R.id.activity_main_menu_rating:
-                toast(this, "rating");
-                ordering = ORDERING_BY_RATING;
-                loadMovies();
-                break;
+                reloadMoviesBy(ORDERING_BY_RATING); break;
             case R.id.activity_main_menu_favorite:
-                toast(this, "favorite");
-                ordering = ORDERING_BY_FAVORITE;
-                loadMovies();
-                break;
+                reloadMoviesBy(ORDERING_BY_FAVORITE); break;
             case R.id.activity_main_menu_refresh:
-                toast(this, "refresh");
-                loadMovies();
-                break;
-            default: return super.onOptionsItemSelected(item);
+                loadMovies(); break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    private void reloadMoviesBy(int newOrdering) {
+        ordering = newOrdering;
+        loadMovies();
     }
 }

@@ -10,11 +10,9 @@ import org.json.JSONObject;
 public class MovieJSONUtils {
 
     public static Movie[] getMoviesFromJson(String json) throws JSONException{
-        Movie[] movies = null;
-
         JSONObject root = new JSONObject(json);
         JSONArray movieJsons = root.getJSONArray("results");
-        movies = new Movie[movieJsons.length()];
+        Movie[] movies = new Movie[movieJsons.length()];
 
         for (int i = 0; i < movies.length; i++) {
             JSONObject movieJson = movieJsons.getJSONObject(i);
@@ -29,6 +27,8 @@ public class MovieJSONUtils {
             Movie movie = new Movie(movieId, originalTitle, thumbnailPath, date, rating, overview);
             movies[i] = movie;
         }
-        return movies;
+
+        if (movies[0] == null) return null;
+        else return movies;
     }
 }
