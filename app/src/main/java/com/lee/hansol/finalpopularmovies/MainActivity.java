@@ -31,11 +31,15 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
 
     private final int GRID_COL_NUM = 2;
 
-    private final int BY_POPULARITY = 151;
-    private final int BY_RATING = 152;
-    private final int BY_FAVORITE = 153;
+    private final int BY_POPULARITY = 0;
+    private final int BY_RATING = 1;
+    private final int BY_FAVORITE = 2;
+
+    private final int LOADER_LOAD_MOVIES_ID = 1515;
 
     public static final String INTENT_EXTRA_MOVIE_OBJECT = "movie-object";
+
+    private final String BUNDLE_ORDERING_KEY = "bundle-ordering";
 
     //TODO: get last saved currentOrdering and apply it to this variable
     private int currentOrdering = BY_POPULARITY;
@@ -62,9 +66,12 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     private void startLoader() {
-        Loader<Movie[]> loader = getSupportLoaderManager().getLoader(currentOrdering);
-        if (loader == null) getSupportLoaderManager().initLoader(currentOrdering, null, this);
-        else getSupportLoaderManager().restartLoader(currentOrdering, null, this);
+        Bundle args = new Bundle();
+        args.putInt(BUNDLE_ORDERING_KEY, currentOrdering);
+
+        Loader<Movie[]> loader = getSupportLoaderManager().getLoader(LOADER_LOAD_MOVIES_ID);
+        if (loader == null) getSupportLoaderManager().initLoader(LOADER_LOAD_MOVIES_ID, args, this);
+        else getSupportLoaderManager().restartLoader(LOADER_LOAD_MOVIES_ID, args, this);
     }
 
     private void showErrorMessage() {
@@ -92,15 +99,18 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
 
     @Override
     public Loader<Movie[]> onCreateLoader(int id, Bundle args) {
-        if (id == BY_POPULARITY) {
+        if (!args.containsKey(BUNDLE_ORDERING_KEY)) throw new RuntimeException("Ordering key not passed to onCreateLoader");
+        int ordering = args.getInt(BUNDLE_ORDERING_KEY);
+
+        if (ordering == BY_POPULARITY) {
             return new PopularMoviesAsyncTaskLoader(this);
-        } else if (id == BY_RATING){
+        } else if (ordering == BY_RATING){
             return new RatingMoviesAsyncTaskLoader(this);
-        } else if (id == BY_FAVORITE){
+        } else if (ordering == BY_FAVORITE){
             //TODO implement
             throw new RuntimeException("unimplemented");
         } else {
-            throw new UnsupportedOperationException("Unknown loader id: " + id);
+            throw new UnsupportedOperationException("Unknown ordering: " + ordering);
         }
     }
 
@@ -155,13 +165,5 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     private void reloadMoviesBy(int newOrdering) {
         currentOrdering = newOrdering;
         loadMovies();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //TODO: Got a problem. When coming back from the DetailsActivity, somehow the images are
-        // random
-//        loadMovies();
     }
 }
