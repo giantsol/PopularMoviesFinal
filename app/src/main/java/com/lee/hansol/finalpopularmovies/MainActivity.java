@@ -1,6 +1,7 @@
 package com.lee.hansol.finalpopularmovies;
 
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -28,16 +29,14 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
 
     private final int GRID_COL_NUM = 2;
 
-    private final int LOADER_ID_POPULAR_MOVIES_ONLINE = 125;
-    private final int LOADER_ID_RATING_MOVIES_ONLINE = 126;
-    private final int LOADER_ID_FAVORITE_MOVIES_LOCAL = 127;
+    private final int BY_POPULARITY = 151;
+    private final int BY_RATING = 152;
+    private final int BY_FAVORITE = 153;
 
-    private final int ORDERING_BY_POPULARITY = 0;
-    private final int ORDERING_BY_RATING = 1;
-    private final int ORDERING_BY_FAVORITE = 2;
+    private final String INTENT_EXTRA_MOVIE_OBJECT = "movie-object";
 
     //TODO: get last saved ordering and apply it to this variable
-    private int ordering = ORDERING_BY_POPULARITY;
+    private int ordering = BY_POPULARITY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,16 +56,13 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
 
     private void loadMovies() {
         showOnlyProgressBar();
-        if (ordering == ORDERING_BY_POPULARITY) startLoader(LOADER_ID_POPULAR_MOVIES_ONLINE);
-        else if (ordering == ORDERING_BY_RATING) startLoader(LOADER_ID_RATING_MOVIES_ONLINE);
-        else if (ordering == ORDERING_BY_FAVORITE) startLoader(LOADER_ID_FAVORITE_MOVIES_LOCAL);
-        else { throw new UnsupportedOperationException("Unknown ordering: " + ordering); }
+        startLoader();
     }
 
-    private void startLoader(int loaderId) {
-        Loader<Movie[]> loader = getSupportLoaderManager().getLoader(loaderId);
-        if (loader == null) getSupportLoaderManager().initLoader(loaderId, null, this);
-        else getSupportLoaderManager().restartLoader(loaderId, null, this);
+    private void startLoader() {
+        Loader<Movie[]> loader = getSupportLoaderManager().getLoader(ordering);
+        if (loader == null) getSupportLoaderManager().initLoader(ordering, null, this);
+        else getSupportLoaderManager().restartLoader(ordering, null, this);
     }
 
     private void showErrorMessage() {
@@ -87,17 +83,18 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
 
     @Override
     public void onItemClick(Movie movie) {
-        //TODO: Go to DetailsActivity with the given movie
-        toast(this, movie.title);
+        Intent intent = new Intent(this, DetailsActivity.class);
+        intent.putExtra(INTENT_EXTRA_MOVIE_OBJECT, movie);
+        startActivity(intent);
     }
 
     @Override
     public Loader<Movie[]> onCreateLoader(int id, Bundle args) {
-        if (id == LOADER_ID_POPULAR_MOVIES_ONLINE) {
+        if (id == BY_POPULARITY) {
             return new PopularMoviesAsyncTaskLoader(this);
-        } else if (id == LOADER_ID_RATING_MOVIES_ONLINE){
+        } else if (id == BY_RATING){
             return new RatingMoviesAsyncTaskLoader(this);
-        } else if (id == LOADER_ID_FAVORITE_MOVIES_LOCAL){
+        } else if (id == BY_FAVORITE){
             //TODO implement
             throw new RuntimeException("unimplemented");
         } else {
@@ -132,11 +129,11 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.activity_main_menu_popularity:
-                reloadMoviesBy(ORDERING_BY_POPULARITY); break;
+                reloadMoviesBy(BY_POPULARITY); break;
             case R.id.activity_main_menu_rating:
-                reloadMoviesBy(ORDERING_BY_RATING); break;
+                reloadMoviesBy(BY_RATING); break;
             case R.id.activity_main_menu_favorite:
-                reloadMoviesBy(ORDERING_BY_FAVORITE); break;
+                reloadMoviesBy(BY_FAVORITE); break;
             case R.id.activity_main_menu_refresh:
                 loadMovies(); break;
             default:
@@ -148,5 +145,13 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     private void reloadMoviesBy(int newOrdering) {
         ordering = newOrdering;
         loadMovies();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //TODO: Got a problem. When coming back from the DetailsActivity, somehow the images are
+        // random
+//        loadMovies();
     }
 }
