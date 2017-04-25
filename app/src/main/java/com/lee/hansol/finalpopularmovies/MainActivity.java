@@ -1,8 +1,9 @@
 package com.lee.hansol.finalpopularmovies;
 
 import android.databinding.DataBindingUtil;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,7 +12,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.lee.hansol.finalpopularmovies.adapters.MovieListAdapter;
-import com.lee.hansol.finalpopularmovies.asynctasks.PopularMoviesAsyncTask;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityMainBinding;
 import com.lee.hansol.finalpopularmovies.models.Movie;
 import com.lee.hansol.finalpopularmovies.utils.MovieJSONUtils;
@@ -20,12 +20,15 @@ import com.lee.hansol.finalpopularmovies.utils.UriUtils;
 
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements MovieListAdapter.OnMovieItemClickListener, PopularMoviesAsyncTask.MovieLoaderCallbacks{
+public class MainActivity extends AppCompatActivity implements
+        MovieListAdapter.OnMovieItemClickListener,
+        android.support.v4.app.LoaderManager.LoaderCallbacks<Movie[]> {
     private ActivityMainBinding mainLayout;
     private MovieListAdapter recyclerViewAdapter;
     private Toast toast;
 
     private final int GRID_COL_NUM = 2;
+    private final int LOADER_ID_POPULAR_MOVIES_ONLINE = 125;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,16 +47,11 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     private void fillWithPopularMovies() {
-        URL popularMoviesUrl = UriUtils.getPopularMoviesUrl(this);
-        if (popularMoviesUrl == null) {
-            showErrorMessage();
-        } else {
-            startLoadingMoviesOnline(popularMoviesUrl);
-        }
+        startLoadingPopularMoviesOnline();
     }
 
-    private void startLoadingMoviesOnline(URL url) {
-        new PopularMoviesAsyncTask(this).execute(url);
+    private void startLoadingPopularMoviesOnline() {
+        getSupportLoaderManager().initLoader(LOADER_ID_POPULAR_MOVIES_ONLINE, null, this);
     }
 
     private void showErrorMessage() {
@@ -81,17 +79,60 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     @Override
-    public void onPreMovieLoad() {
-        showOnlyProgressBar();
+    public Loader<Movie[]> onCreateLoader(int id, Bundle args) {
+        if (id == LOADER_ID_POPULAR_MOVIES_ONLINE) {
+            return new AsyncTaskLoader<Movie[]>(this) {
+                Movie[] movies = null;
+
+                @Override
+                protected void onStartLoading() {
+                    if (movies != null) deliverResult(movies);
+                    else {
+                        showOnlyProgressBar();
+                        forceLoad();
+                    }
+                }
+
+                @Override
+                public Movie[] loadInBackground() {
+                    URL url = UriUtils.getPopularMoviesUrl(getApplicationContext());
+                    if (url == null) return null;
+                    return loadMoviesFrom(url);
+                }
+
+                private Movie[] loadMoviesFrom(URL url) {
+                    Movie[] movies = null;
+                    try {
+                        String responseInJSON = NetworkUtils.getResponseFromHttpUrl(url);
+                        movies = MovieJSONUtils.getMoviesFromJson(responseInJSON);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return movies;
+                }
+
+                public void deliverResult(Movie[] data) {
+                    movies = data;
+                    super.deliverResult(movies);
+                }
+            };
+        } else {
+            throw new RuntimeException("unimplemented");
+        }
     }
 
     @Override
-    public void onPostMovieLoad(Movie[] movies) {
-        if (movies == null) {
-            showErrorMessage();
-        } else {
-            recyclerViewAdapter.setMoviesAndRefresh(movies);
+    public void onLoadFinished(Loader<Movie[]> loader, Movie[] data) {
+        if (data == null) showErrorMessage();
+        else {
+            recyclerViewAdapter.setMoviesAndRefresh(data);
             showMovieListView();
         }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Movie[]> loader) {
+        loader.cancelLoad();
+        recyclerViewAdapter.setMoviesAndRefresh(null);
     }
 }
