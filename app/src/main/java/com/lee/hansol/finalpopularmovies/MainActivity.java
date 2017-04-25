@@ -2,6 +2,7 @@ package com.lee.hansol.finalpopularmovies;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.lee.hansol.finalpopularmovies.adapters.MovieListAdapter;
+import com.lee.hansol.finalpopularmovies.asynctaskloaders.PopularMoviesAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityMainBinding;
 import com.lee.hansol.finalpopularmovies.models.Movie;
 import com.lee.hansol.finalpopularmovies.utils.MovieJSONUtils;
@@ -22,7 +24,7 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements
         MovieListAdapter.OnMovieItemClickListener,
-        android.support.v4.app.LoaderManager.LoaderCallbacks<Movie[]> {
+        LoaderManager.LoaderCallbacks<Movie[]> {
     private ActivityMainBinding mainLayout;
     private MovieListAdapter recyclerViewAdapter;
     private Toast toast;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startLoadingPopularMoviesOnline() {
+        showOnlyProgressBar();
         getSupportLoaderManager().initLoader(LOADER_ID_POPULAR_MOVIES_ONLINE, null, this);
     }
 
@@ -81,41 +84,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public Loader<Movie[]> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID_POPULAR_MOVIES_ONLINE) {
-            return new AsyncTaskLoader<Movie[]>(this) {
-                Movie[] movies = null;
-
-                @Override
-                protected void onStartLoading() {
-                    if (movies != null) deliverResult(movies);
-                    else {
-                        showOnlyProgressBar();
-                        forceLoad();
-                    }
-                }
-
-                @Override
-                public Movie[] loadInBackground() {
-                    URL url = UriUtils.getPopularMoviesUrl(getApplicationContext());
-                    if (url == null) return null;
-                    return loadMoviesFrom(url);
-                }
-
-                private Movie[] loadMoviesFrom(URL url) {
-                    Movie[] movies = null;
-                    try {
-                        String responseInJSON = NetworkUtils.getResponseFromHttpUrl(url);
-                        movies = MovieJSONUtils.getMoviesFromJson(responseInJSON);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return movies;
-                }
-
-                public void deliverResult(Movie[] data) {
-                    movies = data;
-                    super.deliverResult(movies);
-                }
-            };
+            return new PopularMoviesAsyncTaskLoader(this);
         } else {
             throw new RuntimeException("unimplemented");
         }
