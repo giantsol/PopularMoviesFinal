@@ -5,14 +5,14 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.lee.hansol.finalpopularmovies.models.Movie;
-import com.lee.hansol.finalpopularmovies.utils.MovieJSONUtils;
+import com.lee.hansol.finalpopularmovies.utils.JSONUtils;
 import com.lee.hansol.finalpopularmovies.utils.NetworkUtils;
 
 import java.net.URL;
 
-public abstract class AbstractMoviesAsyncTaskLoader extends AsyncTaskLoader<Movie[]> {
+abstract class AbstractMoviesAsyncTaskLoader extends AsyncTaskLoader<Movie[]> {
 
-    public AbstractMoviesAsyncTaskLoader(Context context) {
+    AbstractMoviesAsyncTaskLoader(Context context) {
         super(context);
     }
 
@@ -34,7 +34,7 @@ public abstract class AbstractMoviesAsyncTaskLoader extends AsyncTaskLoader<Movi
         Movie[] movies = null;
         try {
             String responseInJSON = NetworkUtils.getResponseFromHttpUrl(url);
-            movies = MovieJSONUtils.getMoviesFromJson(responseInJSON);
+            movies = JSONUtils.getMoviesFromJson(responseInJSON);
         } catch (Exception e) {
             e.printStackTrace();
         }
