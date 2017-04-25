@@ -2,9 +2,12 @@ package com.lee.hansol.finalpopularmovies;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -28,6 +31,7 @@ import static com.lee.hansol.finalpopularmovies.utils.ToastUtils.toast;
 public class MainActivity extends AppCompatActivity implements MovieListAdapter.OnMovieItemClickListener, LoaderManager.LoaderCallbacks<Movie[]> {
     private ActivityMainBinding layout;
     private MovieListAdapter recyclerViewAdapter;
+    private SharedPreferences prefs;
 
     private final int GRID_COL_NUM = 2;
 
@@ -41,7 +45,8 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
 
     private final String BUNDLE_ORDERING_KEY = "bundle-ordering";
 
-    //TODO: get last saved currentOrdering and apply it to this variable
+    private final String PREF_KEY_LATEST_ORDERING = "latest-ordering";
+
     private int currentOrdering = BY_POPULARITY;
 
     @Override
@@ -57,6 +62,10 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
         layout.activityMainRecyclerView.setLayoutManager(gridLayoutManager);
         recyclerViewAdapter = new MovieListAdapter(this);
         layout.activityMainRecyclerView.setAdapter(recyclerViewAdapter);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        currentOrdering = prefs.getInt(PREF_KEY_LATEST_ORDERING, BY_POPULARITY);
+
         loadMovies();
     }
 
@@ -165,5 +174,11 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     private void reloadMoviesBy(int newOrdering) {
         currentOrdering = newOrdering;
         loadMovies();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        prefs.edit().putInt(PREF_KEY_LATEST_ORDERING, currentOrdering).apply();
     }
 }
