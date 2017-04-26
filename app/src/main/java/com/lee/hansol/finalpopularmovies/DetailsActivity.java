@@ -1,7 +1,10 @@
 package com.lee.hansol.finalpopularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
@@ -21,10 +24,12 @@ import com.lee.hansol.finalpopularmovies.adapters.TrailerListAdapter;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieReviewsAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieTrailersAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityDetailsBinding;
+import com.lee.hansol.finalpopularmovies.helpers.MovieContract;
 import com.lee.hansol.finalpopularmovies.models.Movie;
 import com.lee.hansol.finalpopularmovies.utils.UriUtils;
 import com.squareup.picasso.Picasso;
 
+import static android.R.attr.id;
 import static com.lee.hansol.finalpopularmovies.utils.ToastUtils.toast;
 
 public class DetailsActivity extends AppCompatActivity implements
@@ -33,6 +38,8 @@ public class DetailsActivity extends AppCompatActivity implements
     private ActivityDetailsBinding layout;
     private TrailerListAdapter trailerListAdapter;
     private ReviewListAdapter reviewListAdapter;
+    private MenuItem favoriteButton;
+    private Movie movie;
 
     private final int LOADER_LOAD_TRAILERS_ID = 156;
     private final int LOADER_LOAD_REVIEWS_ID = 157;
@@ -72,16 +79,18 @@ public class DetailsActivity extends AppCompatActivity implements
 
     private void setupViewContents() {
         Intent callingIntent = getIntent();
-        if (receivedMovieObjectSuccessfullyFrom(callingIntent)) fillContentsWith(getMovieObjectFromIntent(callingIntent));
+        movie = getMovieObjectFromIntent(callingIntent);
+        if (movie != null) fillContentsWith(movie);
         else showErrorView();
     }
 
-    private boolean receivedMovieObjectSuccessfullyFrom(Intent callingIntent) {
-        return callingIntent != null && callingIntent.hasExtra(MainActivity.INTENT_EXTRA_MOVIE_OBJECT);
+    private Movie getMovieObjectFromIntent(Intent intent) {
+        if (hasMovieObject(intent)) return intent.getParcelableExtra(MainActivity.INTENT_EXTRA_MOVIE_OBJECT);
+        else return null;
     }
 
-    private Movie getMovieObjectFromIntent(Intent intent) {
-        return intent.getParcelableExtra(MainActivity.INTENT_EXTRA_MOVIE_OBJECT);
+    private boolean hasMovieObject(Intent intent) {
+        return intent != null && intent.hasExtra(MainActivity.INTENT_EXTRA_MOVIE_OBJECT);
     }
 
     private void fillContentsWith(Movie movie) {
@@ -155,17 +164,67 @@ public class DetailsActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_details, menu);
-        MenuItem star = menu.findItem(R.id.activity_details_menu_favorite);
-        if (isFavoriteMovie) star.setIcon(R.drawable.ic_star_filled);
-        else star.setIcon(R.drawable.ic_star_empty);
+        favoriteButton = menu.findItem(R.id.activity_details_menu_favorite);
+
+        if (isFavoriteMovie) favoriteButton.setIcon(R.drawable.ic_star_filled);
+        else favoriteButton.setIcon(R.drawable.ic_star_empty);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            Cursor cursor = getContentResolver().query(MovieContract.FavoriteMovieEntry.CONTENT_URI, new String[]{MovieContract.FavoriteMovieEntry.COLUMN_TITLE},
+                    null, null, null);
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        Toast.makeText(this, cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteMovieEntry.COLUMN_TITLE)),Toast.LENGTH_SHORT).show();
+                    } while (cursor.moveToNext());
+                }
+
+            }
             NavUtils.navigateUpFromSameTask(this);
-            return true;
-        } else return super.onOptionsItemSelected(item);
+        } else if (id == R.id.activity_details_menu_favorite) {
+            if (movie == null) return false;
+
+            if (isFavoriteMovie) defavoriteThisMovie();
+            else favoriteThisMovie();
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    private void defavoriteThisMovie() {
+        favoriteButton.setEnabled(false);
+        //do thing about contentresolver
+        getContentResolver().delete(MovieContract.FavoriteMovieEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(movie.movieId)).build(), null, null);
+
+        //and then change
+        toast(this, getString(R.string.message_defavorited));
+        isFavoriteMovie = false;
+        favoriteButton.setIcon(R.drawable.ic_star_empty);
+        favoriteButton.setEnabled(true);
+    }
+
+    private void favoriteThisMovie() {
+        favoriteButton.setEnabled(false);
+        //do thing about contentresolver
+        ContentValues values = new ContentValues();
+        values.put(MovieContract.FavoriteMovieEntry.COLUMN_MOVIE_ID, movie.movieId);
+        values.put(MovieContract.FavoriteMovieEntry.COLUMN_TITLE, movie.title);
+        values.put(MovieContract.FavoriteMovieEntry.COLUMN_THUMBNAIL_PATH, movie.thumbnailPath);
+        values.put(MovieContract.FavoriteMovieEntry.COLUMN_DATE, movie.date);
+        values.put(MovieContract.FavoriteMovieEntry.COLUMN_RATING, movie.rating);
+        values.put(MovieContract.FavoriteMovieEntry.COLUMN_OVERVIEW, movie.overview);
+        getContentResolver().insert(MovieContract.FavoriteMovieEntry.CONTENT_URI, values);
+
+        //and then change
+        toast(this, getString(R.string.message_favorited));
+        isFavoriteMovie = true;
+        favoriteButton.setIcon(R.drawable.ic_star_filled);
+        favoriteButton.setEnabled(true);
     }
 }
