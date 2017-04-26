@@ -19,6 +19,7 @@ import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieReviewsAsyncTaskL
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieTrailersAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityDetailsBinding;
 import com.lee.hansol.finalpopularmovies.models.Movie;
+import com.lee.hansol.finalpopularmovies.utils.UriUtils;
 import com.squareup.picasso.Picasso;
 
 import static com.lee.hansol.finalpopularmovies.utils.ToastUtils.toast;
@@ -46,6 +47,7 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         layout.activityDetailsTrailersRecyclerView.setLayoutManager(linearLayoutManager);
         trailerListAdapter = new TrailerListAdapter(this);
         layout.activityDetailsTrailersRecyclerView.setAdapter(trailerListAdapter);
+
         setupActionBar();
         setupViewContents();
     }
@@ -131,7 +133,9 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public void onTrailerItemClick(String trailerKey) {
-        toast(this, trailerKey);
+        Intent youtubeIntent = new Intent(Intent.ACTION_VIEW);
+        youtubeIntent.setData(UriUtils.getYoutubeVideoUri(this, trailerKey));
+        startActivity(youtubeIntent);
     }
 
     @Override

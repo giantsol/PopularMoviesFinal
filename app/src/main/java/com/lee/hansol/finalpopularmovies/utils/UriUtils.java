@@ -41,4 +41,12 @@ public class UriUtils {
         String baseUrl = String.format(context.getString(R.string.url_base_reviews_with_id_holder), movieid);
         return getApiKeyAppendedUrl(context, baseUrl);
     }
+
+    public static Uri getYoutubeVideoUri(Context context, String videoKey) {
+        String baseUri = context.getString(R.string.url_base_youtube_video);
+        Uri uri = Uri.parse(baseUri).buildUpon()
+                .appendQueryParameter(context.getString(R.string.url_param_video_key), videoKey)
+                .build();
+        return uri;
+    }
 }
