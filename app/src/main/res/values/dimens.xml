@@ -10,4 +10,6 @@
     <dimen name="spacing_big">20dp</dimen>
     <dimen name="spacing_extra_big">30dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="movie_title_height">100dp</dimen>
 </resources>
