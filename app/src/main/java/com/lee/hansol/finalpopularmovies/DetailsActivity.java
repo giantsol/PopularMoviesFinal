@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.lee.hansol.finalpopularmovies.adapters.ReviewListAdapter;
 import com.lee.hansol.finalpopularmovies.adapters.TrailerListAdapter;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieReviewsAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieTrailersAsyncTaskLoader;
@@ -24,10 +25,12 @@ import com.squareup.picasso.Picasso;
 
 import static com.lee.hansol.finalpopularmovies.utils.ToastUtils.toast;
 
-public class DetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String[]>,
-            TrailerListAdapter.OnTrailerItemClickListener {
+public class DetailsActivity extends AppCompatActivity implements
+        LoaderManager.LoaderCallbacks<String[]>,
+        TrailerListAdapter.OnTrailerItemClickListener {
     private ActivityDetailsBinding layout;
     private TrailerListAdapter trailerListAdapter;
+    private ReviewListAdapter reviewListAdapter;
 
     private final int LOADER_LOAD_TRAILERS_ID = 156;
     private final int LOADER_LOAD_REVIEWS_ID = 157;
@@ -42,11 +45,17 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private void initialize() {
-        layout.activityDetailsTrailersRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        layout.activityDetailsTrailersRecyclerView.setHasFixedSize(true);
         layout.activityDetailsTrailersRecyclerView.setLayoutManager(linearLayoutManager);
         trailerListAdapter = new TrailerListAdapter(this);
         layout.activityDetailsTrailersRecyclerView.setAdapter(trailerListAdapter);
+
+        RecyclerView.LayoutManager linearLayoutManager2 = new LinearLayoutManager(this);
+        layout.activityDetailsReviewsRecyclerView.setHasFixedSize(true);
+        layout.activityDetailsReviewsRecyclerView.setLayoutManager(linearLayoutManager2);
+        reviewListAdapter = new ReviewListAdapter();
+        layout.activityDetailsReviewsRecyclerView.setAdapter(reviewListAdapter);
 
         setupActionBar();
         setupViewContents();
@@ -123,6 +132,7 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
         if (loaderId == LOADER_LOAD_TRAILERS_ID) {
             trailerListAdapter.setTrailerKeysAndRefresh(data);
         } else if (loaderId == LOADER_LOAD_REVIEWS_ID){
+            reviewListAdapter.setReviewsAndRefresh(data);
         }
     }
 

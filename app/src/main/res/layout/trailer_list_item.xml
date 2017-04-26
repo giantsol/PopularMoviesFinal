@@ -34,4 +34,11 @@
         android:textColor="@android:color/black"
         tools:text="Trailers 1"
         />
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@android:color/darker_gray"/>
 </android.support.constraint.ConstraintLayout>
