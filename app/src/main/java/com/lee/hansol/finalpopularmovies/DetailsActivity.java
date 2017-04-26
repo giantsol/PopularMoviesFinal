@@ -10,6 +10,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -36,6 +38,8 @@ public class DetailsActivity extends AppCompatActivity implements
     private final int LOADER_LOAD_REVIEWS_ID = 157;
 
     private final String BUNDLE_MOVIE_ID_KEY = "movie-id";
+
+    private boolean isFavoriteMovie = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +150,15 @@ public class DetailsActivity extends AppCompatActivity implements
         Intent youtubeIntent = new Intent(Intent.ACTION_VIEW);
         youtubeIntent.setData(UriUtils.getYoutubeVideoUri(this, trailerKey));
         startActivity(youtubeIntent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_details, menu);
+        MenuItem star = menu.findItem(R.id.activity_details_menu_favorite);
+        if (isFavoriteMovie) star.setIcon(R.drawable.ic_star_filled);
+        else star.setIcon(R.drawable.ic_star_empty);
+        return true;
     }
 
     @Override

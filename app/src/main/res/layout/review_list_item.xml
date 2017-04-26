@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/spacing_normal"
-        android:drawableTop="@drawable/ic_comment_black_24dp"
+        android:drawableTop="@drawable/ic_comment_24dp"
         android:textSize="@dimen/textSize_normal"
         android:textColor="@android:color/black"/>
     <ImageView

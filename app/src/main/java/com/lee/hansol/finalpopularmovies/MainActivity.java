@@ -149,8 +149,6 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
-        MenuItem refreshButton = menu.findItem(R.id.activity_main_menu_refresh);
-        refreshButton.getIcon().setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_IN);
         return true;
     }
 

@@ -67,7 +67,7 @@
                     android:padding="@dimen/spacing_normal"
                     android:scaleType="fitCenter"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/ic_refresh_black_24dp"/>
+                    android:src="@drawable/ic_refresh_white_24dp"/>
                 <TextView
                     android:id="@+id/activity_details_date"
                     android:layout_width="0dp"
