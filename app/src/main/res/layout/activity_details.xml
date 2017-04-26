@@ -46,17 +46,8 @@
                     app:layout_constraintBottom_toTopOf="@id/title_bottom_guideline"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    android:textSize="@dimen/textSize_extra_big"
-                    android:gravity="bottom|start"
-                    android:paddingLeft="@dimen/spacing_normal"
-                    android:paddingStart="@dimen/spacing_normal"
-                    android:paddingRight="@dimen/spacing_normal"
-                    android:paddingEnd="@dimen/spacing_normal"
-                    android:paddingBottom="@dimen/spacing_normal"
-                    android:background="@color/colorPrimary"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    tools:text="Sen and Chihiro"/>
+                    tools:text="Sen and Chihiro"
+                    style="@style/movieTitleStyle"/>
                 <ImageView
                     android:id="@+id/activity_details_thumbnail"
                     android:layout_width="0dp"
@@ -64,10 +55,7 @@
                     app:layout_constraintTop_toBottomOf="@id/title_bottom_guideline"
                     app:layout_constraintLeft_toRightOf="@id/vertical_left_margin_guideline"
                     app:layout_constraintRight_toLeftOf="@id/vertical_half_guideline"
-                    android:padding="@dimen/spacing_normal"
-                    android:scaleType="fitCenter"
-                    android:adjustViewBounds="true"
-                    android:src="@drawable/ic_refresh_white_24dp"/>
+                    style="@style/thumbnailStyle"/>
                 <TextView
                     android:id="@+id/activity_details_date"
                     android:layout_width="0dp"
@@ -75,15 +63,8 @@
                     app:layout_constraintTop_toTopOf="@id/title_bottom_guideline"
                     app:layout_constraintLeft_toRightOf="@id/vertical_half_guideline"
                     app:layout_constraintRight_toLeftOf="@id/vertical_right_margin_guideline"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/textSize_big"
-                    android:gravity="start"
-                    android:layout_marginTop="@dimen/spacing_big"
-                    android:paddingLeft="@dimen/spacing_normal"
-                    android:paddingStart="@dimen/spacing_normal"
-                    android:paddingRight="@dimen/spacing_normal"
-                    android:paddingEnd="@dimen/spacing_normal"
-                    tools:text="2015/04/10"/>
+                    tools:text="2015/04/10"
+                    style="@style/subheaderStyle"/>
                 <TextView
                     android:id="@+id/activity_details_rating"
                     android:layout_width="0dp"
@@ -91,15 +72,8 @@
                     app:layout_constraintTop_toBottomOf="@id/activity_details_date"
                     app:layout_constraintLeft_toRightOf="@id/vertical_half_guideline"
                     app:layout_constraintRight_toLeftOf="@id/vertical_right_margin_guideline"
-                    android:layout_marginTop="@dimen/spacing_big"
-                    android:paddingLeft="@dimen/spacing_normal"
-                    android:paddingStart="@dimen/spacing_normal"
-                    android:paddingRight="@dimen/spacing_normal"
-                    android:paddingEnd="@dimen/spacing_normal"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/textSize_small"
-                    android:gravity="start"
-                    tools:text="8.1 / 10"/>
+                    tools:text="8.1 / 10"
+                    style="@style/subheaderStyle"/>
                 <TextView
                     android:id="@+id/activity_details_overview"
                     android:layout_width="0dp"
@@ -107,11 +81,9 @@
                     app:layout_constraintTop_toBottomOf="@id/activity_details_thumbnail"
                     app:layout_constraintLeft_toLeftOf="@id/vertical_left_margin_guideline"
                     app:layout_constraintRight_toRightOf="@id/vertical_right_margin_guideline"
-                    android:layout_marginTop="@dimen/spacing_big"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="@dimen/textSize_normal"
-                    tools:text="Once upon a time there was a man...and a man...and a man..and a man... and a woman... and a child"/>
-                <ImageView
+                    tools:text="Once upon a time there was a man...and a man...and a man..and a man... and a woman... and a child"
+                    style="@style/overviewTextStyle"/>
+                <include
                     android:id="@+id/line_under_overview"
                     android:layout_width="0dp"
                     android:layout_height="2dp"
@@ -119,18 +91,15 @@
                     app:layout_constraintLeft_toLeftOf="@id/vertical_left_margin_guideline"
                     app:layout_constraintRight_toRightOf="@id/vertical_right_margin_guideline"
                     android:layout_marginTop="@dimen/spacing_normal"
-                    android:background="@android:color/darker_gray"/>
+                    layout="@layout/separator_line"/>
                 <TextView
                     android:id="@+id/trailers_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toBottomOf="@id/line_under_overview"
                     app:layout_constraintLeft_toLeftOf="@id/vertical_left_margin_guideline"
-                    android:layout_marginTop="@dimen/spacing_small"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/textSize_big"
-                    android:textStyle="bold"
-                    android:text="@string/text_trailers"/>
+                    android:text="@string/text_trailers"
+                    style="@style/headerWithTopMarginStyle"/>
                 <TextView
                     android:id="@+id/activity_details_empty_trailers_view"
                     android:layout_width="0dp"
@@ -138,11 +107,9 @@
                     app:layout_constraintTop_toBottomOf="@id/trailers_text"
                     app:layout_constraintLeft_toRightOf="@id/vertical_left_margin_guideline"
                     app:layout_constraintRight_toLeftOf="@id/vertical_right_margin_guideline"
-                    android:layout_marginTop="@dimen/spacing_normal"
-                    android:padding="@dimen/spacing_big"
-                    android:gravity="center"
                     android:text="@string/message_empty_trailers"
-                    android:visibility="gone"/>
+                    android:visibility="gone"
+                    style="@style/emptyViewTextStyle"/>
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/activity_details_trailers_recycler_view"
                     android:layout_width="0dp"
@@ -165,11 +132,8 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toBottomOf="@id/transparent_line_under_trailers_container"
                     app:layout_constraintLeft_toLeftOf="@id/vertical_left_margin_guideline"
-                    android:layout_marginTop="@dimen/spacing_small"
-                    android:textColor="@android:color/black"
-                    android:textSize="@dimen/textSize_big"
-                    android:textStyle="bold"
-                    android:text="@string/text_reviews"/>
+                    android:text="@string/text_reviews"
+                    style="@style/headerWithTopMarginStyle"/>
                 <TextView
                     android:id="@+id/activity_details_empty_reviews_view"
                     android:layout_width="0dp"
@@ -177,11 +141,9 @@
                     app:layout_constraintTop_toBottomOf="@id/reviews_text"
                     app:layout_constraintLeft_toRightOf="@id/vertical_left_margin_guideline"
                     app:layout_constraintRight_toLeftOf="@id/vertical_right_margin_guideline"
-                    android:layout_marginTop="@dimen/spacing_normal"
-                    android:gravity="center"
-                    android:padding="@dimen/spacing_big"
                     android:text="@string/message_empty_reviews"
-                    android:visibility="gone"/>
+                    android:visibility="gone"
+                    style="@style/emptyViewTextStyle"/>
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/activity_details_reviews_recycler_view"
                     android:layout_width="0dp"
@@ -205,10 +167,8 @@
             android:id="@+id/activity_details_error_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
             android:text="@string/message_error_in_detail_view"
-            android:textColor="@android:color/black"
-            android:textSize="@dimen/textSize_extra_big"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            style="@style/emptyViewTextStyle"/>
     </FrameLayout>
 </layout>

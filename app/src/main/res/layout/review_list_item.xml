@@ -6,13 +6,11 @@
         android:id="@+id/review_list_item_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/spacing_normal"
         android:drawableTop="@drawable/ic_comment_24dp"
-        android:textSize="@dimen/textSize_normal"
-        android:textColor="@android:color/black"/>
-    <ImageView
+        style="@style/normalTextStyle"/>
+    <include
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom"
+        layout="@layout/separator_line"/>
 </FrameLayout>
