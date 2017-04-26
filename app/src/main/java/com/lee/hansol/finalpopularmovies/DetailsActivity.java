@@ -150,17 +150,25 @@ public class DetailsActivity extends AppCompatActivity implements
     public void onLoadFinished(Loader<String[]> loader, String[] data) {
         int loaderId = loader.getId();
         if (loaderId == LOADER_LOAD_TRAILERS_ID) {
-            if (data == null) showTrailersEmptyView();
-            else {
-                trailerListAdapter.setTrailerKeysAndRefresh(data);
-                showTrailerListView();
-            }
+            setTrailersView(data);
         } else if (loaderId == LOADER_LOAD_REVIEWS_ID){
-            if (data == null) showReviewsEmptyView();
-            else {
-                reviewListAdapter.setReviewsAndRefresh(data);
-                showReviewListView();
-            }
+            setReviewsView(data);
+        }
+    }
+
+    private void setTrailersView(String[] data) {
+        if (data == null) showTrailersEmptyView();
+        else {
+            trailerListAdapter.setTrailerKeysAndRefresh(data);
+            showTrailerListView();
+        }
+    }
+
+    private void setReviewsView(String[] data) {
+        if (data == null) showReviewsEmptyView();
+        else {
+            reviewListAdapter.setReviewsAndRefresh(data);
+            showReviewListView();
         }
     }
 
