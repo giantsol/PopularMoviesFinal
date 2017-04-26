@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.lee.hansol.finalpopularmovies.adapters.MovieListAdapter;
+import com.lee.hansol.finalpopularmovies.asynctaskloaders.FavoriteMovieListAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.PopularMovieListAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.RatingMovieListAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityMainBinding;
@@ -119,8 +120,7 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
         } else if (ordering == BY_RATING){
             return new RatingMovieListAsyncTaskLoader(this);
         } else if (ordering == BY_FAVORITE){
-            //TODO implement
-            throw new RuntimeException("unimplemented");
+            return new FavoriteMovieListAsyncTaskLoader(this);
         } else {
             throw new UnsupportedOperationException("Unknown ordering: " + ordering);
         }

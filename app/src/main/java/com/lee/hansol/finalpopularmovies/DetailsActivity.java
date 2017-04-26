@@ -53,10 +53,9 @@ public class DetailsActivity extends AppCompatActivity implements
 
     private void initialize() {
         initializeRecyclerViews();
-        initializeActionBar();
-
+        setupActionBar();
         setupViewContents();
-        setupFavorite();
+        setupFavoriteButton();
     }
 
     private void initializeRecyclerViews() {
@@ -73,7 +72,7 @@ public class DetailsActivity extends AppCompatActivity implements
         layout.activityDetailsReviewsRecyclerView.setAdapter(reviewListAdapter);
     }
 
-    private void initializeActionBar() {
+    private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
     }
@@ -127,7 +126,7 @@ public class DetailsActivity extends AppCompatActivity implements
         layout.activityDetailsErrorView.setVisibility(View.VISIBLE);
     }
 
-    private void setupFavorite() {
+    private void setupFavoriteButton() {
         Cursor cursor = getContentResolver().query(
                 UriUtils.getMovieContentUriWithId(movie.movieId), null, null, null, null, null);
         isFavoriteMovie = cursor != null && cursor.moveToFirst();
@@ -202,7 +201,7 @@ public class DetailsActivity extends AppCompatActivity implements
         favoriteButton.setEnabled(false);
         getContentResolver().delete(UriUtils.getMovieContentUriWithId(movie.movieId), null, null);
         toast(this, getString(R.string.message_defavorited));
-        setupFavorite();
+        setupFavoriteButton();
         favoriteButton.setEnabled(true);
     }
 
@@ -210,7 +209,7 @@ public class DetailsActivity extends AppCompatActivity implements
         favoriteButton.setEnabled(false);
         getContentResolver().insert(MovieContract.FavoriteMovieEntry.CONTENT_URI, getContentValues(movie));
         toast(this, getString(R.string.message_favorited));
-        setupFavorite();
+        setupFavoriteButton();
         favoriteButton.setEnabled(true);
     }
 
