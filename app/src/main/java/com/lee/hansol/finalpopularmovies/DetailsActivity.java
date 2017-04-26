@@ -24,6 +24,7 @@ import com.lee.hansol.finalpopularmovies.adapters.TrailerListAdapter;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieReviewsAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieTrailersAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityDetailsBinding;
+import com.lee.hansol.finalpopularmovies.helpers.FavoriteMovieProvider;
 import com.lee.hansol.finalpopularmovies.helpers.MovieContract;
 import com.lee.hansol.finalpopularmovies.models.Movie;
 import com.lee.hansol.finalpopularmovies.utils.UriUtils;
@@ -68,8 +69,13 @@ public class DetailsActivity extends AppCompatActivity implements
         reviewListAdapter = new ReviewListAdapter();
         layout.activityDetailsReviewsRecyclerView.setAdapter(reviewListAdapter);
 
+
         setupActionBar();
         setupViewContents();
+
+        Cursor cursor = getContentResolver().query(MovieContract.FavoriteMovieEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(movie.movieId)).build(),
+                null, null, null, null, null);
+        isFavoriteMovie = cursor != null && cursor.moveToFirst();
     }
 
     private void setupActionBar() {
@@ -175,16 +181,6 @@ public class DetailsActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            Cursor cursor = getContentResolver().query(MovieContract.FavoriteMovieEntry.CONTENT_URI, new String[]{MovieContract.FavoriteMovieEntry.COLUMN_TITLE},
-                    null, null, null);
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    do {
-                        Toast.makeText(this, cursor.getString(cursor.getColumnIndex(MovieContract.FavoriteMovieEntry.COLUMN_TITLE)),Toast.LENGTH_SHORT).show();
-                    } while (cursor.moveToNext());
-                }
-
-            }
             NavUtils.navigateUpFromSameTask(this);
         } else if (id == R.id.activity_details_menu_favorite) {
             if (movie == null) return false;
