@@ -39,6 +39,3 @@ project.properties
 # Gradle-based build
 .gradle
 build/
-
-# my string resources file
-app/src/main/res/values/strings.xml
