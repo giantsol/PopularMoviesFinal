@@ -31,8 +31,6 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     private MovieListAdapter recyclerViewAdapter;
     private SharedPreferences prefs;
 
-    private final int GRID_COL_NUM = 2;
-
     private final int BY_POPULARITY = 0;
     private final int BY_RATING = 1;
     private final int BY_FAVORITE = 2;
@@ -62,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
 
     private void initializeRecyclerView() {
         layout.activityMainRecyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(this, GRID_COL_NUM, LinearLayoutManager.VERTICAL, false);
+        int gridColumnNum = getResources().getInteger(R.integer.grid_column_num);
+        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(this, gridColumnNum, LinearLayoutManager.VERTICAL, false);
         layout.activityMainRecyclerView.setLayoutManager(gridLayoutManager);
         recyclerViewAdapter = new MovieListAdapter(this);
         layout.activityMainRecyclerView.setAdapter(recyclerViewAdapter);

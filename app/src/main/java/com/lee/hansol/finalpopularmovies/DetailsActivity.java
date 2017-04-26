@@ -26,6 +26,8 @@ import com.lee.hansol.finalpopularmovies.models.Movie;
 import com.lee.hansol.finalpopularmovies.utils.UriUtils;
 import com.squareup.picasso.Picasso;
 
+import java.util.Locale;
+
 import static com.lee.hansol.finalpopularmovies.utils.ToastUtils.toast;
 
 public class DetailsActivity extends AppCompatActivity implements
@@ -104,8 +106,12 @@ public class DetailsActivity extends AppCompatActivity implements
         layout.activityDetailsErrorView.setVisibility(View.INVISIBLE);
         layout.activityDetailsTitle.setText(movie.title);
         Picasso.with(this).load(movie.thumbnailPath).into(layout.activityDetailsThumbnail);
-        layout.activityDetailsDate.setText(movie.date);
-        layout.activityDetailsRating.setText(movie.rating);
+        layout.activityDetailsDate.setText(
+                String.format(Locale.getDefault(), getString(R.string.text_movie_date), movie.date)
+        );
+        layout.activityDetailsRating.setText(
+                String.format(Locale.getDefault(), getString(R.string.text_movie_rating), movie.rating)
+        );
         layout.activityDetailsOverview.setText(movie.overview);
     }
 
