@@ -150,10 +150,38 @@ public class DetailsActivity extends AppCompatActivity implements
     public void onLoadFinished(Loader<String[]> loader, String[] data) {
         int loaderId = loader.getId();
         if (loaderId == LOADER_LOAD_TRAILERS_ID) {
-            trailerListAdapter.setTrailerKeysAndRefresh(data);
+            if (data == null) showTrailersEmptyView();
+            else {
+                trailerListAdapter.setTrailerKeysAndRefresh(data);
+                showTrailerListView();
+            }
         } else if (loaderId == LOADER_LOAD_REVIEWS_ID){
-            reviewListAdapter.setReviewsAndRefresh(data);
+            if (data == null) showReviewsEmptyView();
+            else {
+                reviewListAdapter.setReviewsAndRefresh(data);
+                showReviewListView();
+            }
         }
+    }
+
+    private void showTrailersEmptyView() {
+        layout.activityDetailsEmptyTrailersView.setVisibility(View.VISIBLE);
+        layout.activityDetailsTrailersRecyclerView.setVisibility(View.GONE);
+    }
+
+    private void showTrailerListView() {
+        layout.activityDetailsEmptyTrailersView.setVisibility(View.GONE);
+        layout.activityDetailsTrailersRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void showReviewsEmptyView() {
+        layout.activityDetailsEmptyReviewsView.setVisibility(View.VISIBLE);
+        layout.activityDetailsReviewsRecyclerView.setVisibility(View.GONE);
+    }
+
+    private void showReviewListView() {
+        layout.activityDetailsEmptyReviewsView.setVisibility(View.GONE);
+        layout.activityDetailsReviewsRecyclerView.setVisibility(View.VISIBLE);
     }
 
     @Override

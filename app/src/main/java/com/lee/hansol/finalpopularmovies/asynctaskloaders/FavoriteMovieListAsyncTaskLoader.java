@@ -28,7 +28,7 @@ public class FavoriteMovieListAsyncTaskLoader extends AsyncTaskLoader<Movie[]> {
             if (cursor != null && cursor.moveToFirst()) {
                 do {
                     Movie movie = getMovieObjectFromCursor(cursor);
-                    movies.add(movie);
+                    if (movie != null) movies.add(movie);
                 } while (cursor.moveToNext());
             }
         } catch (Exception e) {

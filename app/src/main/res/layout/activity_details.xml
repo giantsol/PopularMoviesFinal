@@ -131,6 +131,18 @@
                     android:textSize="@dimen/textSize_big"
                     android:textStyle="bold"
                     android:text="@string/text_trailers"/>
+                <TextView
+                    android:id="@+id/activity_details_empty_trailers_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/trailers_text"
+                    app:layout_constraintLeft_toRightOf="@id/vertical_left_margin_guideline"
+                    app:layout_constraintRight_toLeftOf="@id/vertical_right_margin_guideline"
+                    android:layout_marginTop="@dimen/spacing_normal"
+                    android:padding="@dimen/spacing_big"
+                    android:gravity="center"
+                    android:text="@string/message_empty_trailers"
+                    android:visibility="gone"/>
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/activity_details_trailers_recycler_view"
                     android:layout_width="0dp"
@@ -158,6 +170,18 @@
                     android:textSize="@dimen/textSize_big"
                     android:textStyle="bold"
                     android:text="@string/text_reviews"/>
+                <TextView
+                    android:id="@+id/activity_details_empty_reviews_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/reviews_text"
+                    app:layout_constraintLeft_toRightOf="@id/vertical_left_margin_guideline"
+                    app:layout_constraintRight_toLeftOf="@id/vertical_right_margin_guideline"
+                    android:layout_marginTop="@dimen/spacing_normal"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_big"
+                    android:text="@string/message_empty_reviews"
+                    android:visibility="gone"/>
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/activity_details_reviews_recycler_view"
                     android:layout_width="0dp"
