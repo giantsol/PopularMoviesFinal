@@ -25,4 +25,6 @@
     <string name="actionbar_title_popularity">Movies - By Popularity</string>
     <string name="actionbar_title_rating">Movies - By Rating</string>
     <string name="actionbar_title_favorite">My Favorites</string>
+
+    <string name="text_trailers">Trailers: </string>
 </resources>

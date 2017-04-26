@@ -8,18 +8,25 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.lee.hansol.finalpopularmovies.adapters.TrailerListAdapter;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieReviewsAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieTrailersAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityDetailsBinding;
 import com.lee.hansol.finalpopularmovies.models.Movie;
 import com.squareup.picasso.Picasso;
 
-public class DetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String[]>{
+import static com.lee.hansol.finalpopularmovies.utils.ToastUtils.toast;
+
+public class DetailsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String[]>,
+            TrailerListAdapter.OnTrailerItemClickListener {
     private ActivityDetailsBinding layout;
+    private TrailerListAdapter trailerListAdapter;
 
     private final int LOADER_LOAD_TRAILERS_ID = 156;
     private final int LOADER_LOAD_REVIEWS_ID = 157;
@@ -34,6 +41,11 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
     }
 
     private void initialize() {
+        layout.activityDetailsTrailersRecyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        layout.activityDetailsTrailersRecyclerView.setLayoutManager(linearLayoutManager);
+        trailerListAdapter = new TrailerListAdapter(this);
+        layout.activityDetailsTrailersRecyclerView.setAdapter(trailerListAdapter);
         setupActionBar();
         setupViewContents();
     }
@@ -105,25 +117,21 @@ public class DetailsActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public void onLoadFinished(Loader<String[]> loader, String[] data) {
-        if (data ==null) return; //TODO: erase this line later
-
         int loaderId = loader.getId();
         if (loaderId == LOADER_LOAD_TRAILERS_ID) {
-            //TODO: data is an array of trailer keys. Use them to fill out Trailers UI
-            //trailersAdapter.setDataAndRefresh(data); --> null check 안해도됨. Null이면 length가 0이되도록 설정.
-            for (String trailerKey : data) {
-                Toast.makeText(this, trailerKey, Toast.LENGTH_SHORT).show();
-            }
+            trailerListAdapter.setTrailerKeysAndRefresh(data);
         } else if (loaderId == LOADER_LOAD_REVIEWS_ID){
-            for (String review : data) {
-                Toast.makeText(this, review, Toast.LENGTH_LONG).show();
-            }
         }
     }
 
     @Override
     public void onLoaderReset(Loader<String[]> loader) {
         loader.cancelLoad();
+    }
+
+    @Override
+    public void onTrailerItemClick(String trailerKey) {
+        toast(this, trailerKey);
     }
 
     @Override
