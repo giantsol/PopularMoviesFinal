@@ -1,20 +1,17 @@
 package com.lee.hansol.finalpopularmovies.asynctaskloaders;
 
-
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
-import com.lee.hansol.finalpopularmovies.models.Movie;
-import com.lee.hansol.finalpopularmovies.utils.JSONUtils;
 import com.lee.hansol.finalpopularmovies.utils.NetworkUtils;
+
+import org.json.JSONException;
 
 import java.net.URL;
 
-abstract class AbstractMoviesAsyncTaskLoader extends AsyncTaskLoader<Movie[]> {
+abstract class AbstractAsyncTaskLoaderWithJson<T> extends AsyncTaskLoader<T> {
 
-    AbstractMoviesAsyncTaskLoader(Context context) {
-        super(context);
-    }
+    AbstractAsyncTaskLoaderWithJson(Context context) { super(context); }
 
     @Override
     protected final void onStartLoading() {
@@ -22,22 +19,24 @@ abstract class AbstractMoviesAsyncTaskLoader extends AsyncTaskLoader<Movie[]> {
     }
 
     @Override
-    public Movie[] loadInBackground() {
+    public final T loadInBackground() {
         URL url = getUrl();
         if (url == null) return null;
-        return loadMoviesFrom(url);
+        return loadFrom(url);
     }
 
     protected abstract URL getUrl();
 
-    private Movie[] loadMoviesFrom(URL url) {
-        Movie[] movies = null;
+    private T loadFrom(URL url) {
+        T t = null;
         try {
             String responseInJSON = NetworkUtils.getResponseFromHttpUrl(url);
-            movies = JSONUtils.getMoviesFromJson(responseInJSON);
+            t = processJson(responseInJSON);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return movies;
+        return t;
     }
+
+    protected abstract T processJson(String responseJson) throws JSONException;
 }

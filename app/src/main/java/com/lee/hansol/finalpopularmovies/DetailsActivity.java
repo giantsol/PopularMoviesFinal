@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
@@ -14,23 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.lee.hansol.finalpopularmovies.adapters.ReviewListAdapter;
 import com.lee.hansol.finalpopularmovies.adapters.TrailerListAdapter;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieReviewsAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.asynctaskloaders.MovieTrailersAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityDetailsBinding;
-import com.lee.hansol.finalpopularmovies.helpers.FavoriteMovieProvider;
 import com.lee.hansol.finalpopularmovies.helpers.MovieContract;
 import com.lee.hansol.finalpopularmovies.models.Movie;
 import com.lee.hansol.finalpopularmovies.utils.UriUtils;
 import com.squareup.picasso.Picasso;
 
-import static android.R.attr.id;
 import static com.lee.hansol.finalpopularmovies.utils.ToastUtils.toast;
 
 public class DetailsActivity extends AppCompatActivity implements
@@ -57,6 +52,14 @@ public class DetailsActivity extends AppCompatActivity implements
     }
 
     private void initialize() {
+        initializeRecyclerViews();
+        initializeActionBar();
+
+        setupViewContents();
+        setupFavorite();
+    }
+
+    private void initializeRecyclerViews() {
         RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this);
         layout.activityDetailsTrailersRecyclerView.setHasFixedSize(true);
         layout.activityDetailsTrailersRecyclerView.setLayoutManager(linearLayoutManager);
@@ -68,17 +71,9 @@ public class DetailsActivity extends AppCompatActivity implements
         layout.activityDetailsReviewsRecyclerView.setLayoutManager(linearLayoutManager2);
         reviewListAdapter = new ReviewListAdapter();
         layout.activityDetailsReviewsRecyclerView.setAdapter(reviewListAdapter);
-
-
-        setupActionBar();
-        setupViewContents();
-
-        Cursor cursor = getContentResolver().query(MovieContract.FavoriteMovieEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(movie.movieId)).build(),
-                null, null, null, null, null);
-        isFavoriteMovie = cursor != null && cursor.moveToFirst();
     }
 
-    private void setupActionBar() {
+    private void initializeActionBar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
     }
@@ -132,6 +127,13 @@ public class DetailsActivity extends AppCompatActivity implements
         layout.activityDetailsErrorView.setVisibility(View.VISIBLE);
     }
 
+    private void setupFavorite() {
+        Cursor cursor = getContentResolver().query(
+                UriUtils.getMovieContentUriWithId(movie.movieId), null, null, null, null, null);
+        isFavoriteMovie = cursor != null && cursor.moveToFirst();
+        invalidateOptionsMenu();
+    }
+
     @Override
     public Loader<String[]> onCreateLoader(int id, Bundle args) {
         int movieId = args.getInt(BUNDLE_MOVIE_ID_KEY);
@@ -171,10 +173,14 @@ public class DetailsActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_details, menu);
         favoriteButton = menu.findItem(R.id.activity_details_menu_favorite);
+        return true;
+    }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
         if (isFavoriteMovie) favoriteButton.setIcon(R.drawable.ic_star_filled);
         else favoriteButton.setIcon(R.drawable.ic_star_empty);
-        return true;
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -184,7 +190,6 @@ public class DetailsActivity extends AppCompatActivity implements
             NavUtils.navigateUpFromSameTask(this);
         } else if (id == R.id.activity_details_menu_favorite) {
             if (movie == null) return false;
-
             if (isFavoriteMovie) defavoriteThisMovie();
             else favoriteThisMovie();
         } else {
@@ -195,19 +200,21 @@ public class DetailsActivity extends AppCompatActivity implements
 
     private void defavoriteThisMovie() {
         favoriteButton.setEnabled(false);
-        //do thing about contentresolver
-        getContentResolver().delete(MovieContract.FavoriteMovieEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(movie.movieId)).build(), null, null);
-
-        //and then change
+        getContentResolver().delete(UriUtils.getMovieContentUriWithId(movie.movieId), null, null);
         toast(this, getString(R.string.message_defavorited));
-        isFavoriteMovie = false;
-        favoriteButton.setIcon(R.drawable.ic_star_empty);
+        setupFavorite();
         favoriteButton.setEnabled(true);
     }
 
     private void favoriteThisMovie() {
         favoriteButton.setEnabled(false);
-        //do thing about contentresolver
+        getContentResolver().insert(MovieContract.FavoriteMovieEntry.CONTENT_URI, getContentValues(movie));
+        toast(this, getString(R.string.message_favorited));
+        setupFavorite();
+        favoriteButton.setEnabled(true);
+    }
+
+    private ContentValues getContentValues(Movie movie) {
         ContentValues values = new ContentValues();
         values.put(MovieContract.FavoriteMovieEntry.COLUMN_MOVIE_ID, movie.movieId);
         values.put(MovieContract.FavoriteMovieEntry.COLUMN_TITLE, movie.title);
@@ -215,12 +222,6 @@ public class DetailsActivity extends AppCompatActivity implements
         values.put(MovieContract.FavoriteMovieEntry.COLUMN_DATE, movie.date);
         values.put(MovieContract.FavoriteMovieEntry.COLUMN_RATING, movie.rating);
         values.put(MovieContract.FavoriteMovieEntry.COLUMN_OVERVIEW, movie.overview);
-        getContentResolver().insert(MovieContract.FavoriteMovieEntry.CONTENT_URI, values);
-
-        //and then change
-        toast(this, getString(R.string.message_favorited));
-        isFavoriteMovie = true;
-        favoriteButton.setIcon(R.drawable.ic_star_filled);
-        favoriteButton.setEnabled(true);
+        return values;
     }
 }

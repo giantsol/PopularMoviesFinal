@@ -6,9 +6,9 @@ import com.lee.hansol.finalpopularmovies.utils.UriUtils;
 
 import java.net.URL;
 
-public class PopularMoviesAsyncTaskLoader extends AbstractMoviesAsyncTaskLoader {
+public class PopularMovieListAsyncTaskLoader extends AbstractMovieListAsyncTaskLoader {
 
-    public PopularMoviesAsyncTaskLoader(Context context) {
+    public PopularMovieListAsyncTaskLoader(Context context) {
         super(context);
     }
 

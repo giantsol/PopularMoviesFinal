@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.lee.hansol.finalpopularmovies.R;
+import com.lee.hansol.finalpopularmovies.helpers.MovieContract;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -48,5 +49,9 @@ public class UriUtils {
                 .appendQueryParameter(context.getString(R.string.url_param_video_key), videoKey)
                 .build();
         return uri;
+    }
+
+    public static Uri getMovieContentUriWithId(int movieId) {
+        return MovieContract.FavoriteMovieEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(movieId)).build();
     }
 }

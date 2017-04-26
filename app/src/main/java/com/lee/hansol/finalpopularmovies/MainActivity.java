@@ -4,9 +4,7 @@ package com.lee.hansol.finalpopularmovies;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -18,11 +16,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.lee.hansol.finalpopularmovies.adapters.MovieListAdapter;
-import com.lee.hansol.finalpopularmovies.asynctaskloaders.PopularMoviesAsyncTaskLoader;
-import com.lee.hansol.finalpopularmovies.asynctaskloaders.RatingMoviesAsyncTaskLoader;
+import com.lee.hansol.finalpopularmovies.asynctaskloaders.PopularMovieListAsyncTaskLoader;
+import com.lee.hansol.finalpopularmovies.asynctaskloaders.RatingMovieListAsyncTaskLoader;
 import com.lee.hansol.finalpopularmovies.databinding.ActivityMainBinding;
 import com.lee.hansol.finalpopularmovies.models.Movie;
 
@@ -57,16 +54,22 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     private void initialize() {
+        initializeRecyclerView();
+        initializeCurrentOrdering();
+        loadMovies();
+    }
+
+    private void initializeRecyclerView() {
         layout.activityMainRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(this, GRID_COL_NUM, LinearLayoutManager.VERTICAL, false);
         layout.activityMainRecyclerView.setLayoutManager(gridLayoutManager);
         recyclerViewAdapter = new MovieListAdapter(this);
         layout.activityMainRecyclerView.setAdapter(recyclerViewAdapter);
+    }
 
+    private void initializeCurrentOrdering() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         currentOrdering = prefs.getInt(PREF_KEY_LATEST_ORDERING, BY_POPULARITY);
-
-        loadMovies();
     }
 
     private void loadMovies() {
@@ -112,9 +115,9 @@ public class MainActivity extends AppCompatActivity implements MovieListAdapter.
         int ordering = args.getInt(BUNDLE_ORDERING_KEY);
 
         if (ordering == BY_POPULARITY) {
-            return new PopularMoviesAsyncTaskLoader(this);
+            return new PopularMovieListAsyncTaskLoader(this);
         } else if (ordering == BY_RATING){
-            return new RatingMoviesAsyncTaskLoader(this);
+            return new RatingMovieListAsyncTaskLoader(this);
         } else if (ordering == BY_FAVORITE){
             //TODO implement
             throw new RuntimeException("unimplemented");

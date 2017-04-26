@@ -9,8 +9,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import javax.sql.RowSetInternal;
-
 public class FavoriteMovieProvider extends ContentProvider {
     public final int CODE_FAVORITE_MOVIE = 200;
     public final int CODE_FAVORITE_MOVIE_WITH_MOVIE_ID = 201;
@@ -22,7 +20,7 @@ public class FavoriteMovieProvider extends ContentProvider {
     public boolean onCreate() {
         uriMatcher = buildUriMatcher();
         dbHelper = new MovieDbHelper(getContext());
-        return false;
+        return true;
     }
 
     private UriMatcher buildUriMatcher() {
@@ -43,11 +41,7 @@ public class FavoriteMovieProvider extends ContentProvider {
             case CODE_FAVORITE_MOVIE:
                 cursor = dbHelper.getReadableDatabase().query(
                         MovieContract.FavoriteMovieEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null, null,
-                        sortOrder);
+                        projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case CODE_FAVORITE_MOVIE_WITH_MOVIE_ID:
                 String movieIdString = uri.getLastPathSegment();
@@ -57,13 +51,11 @@ public class FavoriteMovieProvider extends ContentProvider {
                         projection,
                         MovieContract.FavoriteMovieEntry.COLUMN_MOVIE_ID + " = ? ",
                         selectionArguments,
-                        null, null,
-                        sortOrder);
+                        null, null, sortOrder);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
@@ -81,17 +73,12 @@ public class FavoriteMovieProvider extends ContentProvider {
 
         switch(uriMatcher.match(uri)) {
             case CODE_FAVORITE_MOVIE:
-                long id = dbHelper.getWritableDatabase().insert(
-                        MovieContract.FavoriteMovieEntry.TABLE_NAME,
-                        null,
-                        values
-                );
+                long id = dbHelper.getWritableDatabase().insert(MovieContract.FavoriteMovieEntry.TABLE_NAME, null, values);
                 if (id != -1) rowsInserted++;
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-
         if (rowsInserted > 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }

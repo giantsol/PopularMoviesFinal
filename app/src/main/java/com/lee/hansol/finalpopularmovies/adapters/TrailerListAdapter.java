@@ -34,7 +34,7 @@ public class TrailerListAdapter extends RecyclerView.Adapter<TrailerListAdapter.
 
     @Override
     public void onBindViewHolder(TrailerItemHolder holder, int position) {
-        holder.trailerTitleText.setText(String.format(Locale.getDefault() ,titleTextFormat, position+1));
+        holder.trailerTitleText.setText(String.format(Locale.getDefault(), titleTextFormat, position+1));
     }
 
     @Override

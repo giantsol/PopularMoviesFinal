@@ -63,6 +63,5 @@ public class JSONUtils {
         }
         if (!reviews.isEmpty()) return reviews.toArray(new String[0]);
         else return null;
-
     }
 }
