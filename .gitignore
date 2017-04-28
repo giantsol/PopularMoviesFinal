@@ -41,4 +41,4 @@ project.properties
 build/
 
 # my api key file
-/app/src/main/res/values/string-api-key.xml
+/app/src/main/res/values/string*.xml
