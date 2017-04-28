@@ -1,6 +1,7 @@
 <resources>
+
     <!-- Put your own theMovieDb api key here! -->
-    <string name="api_key"></string>
+    <!--<string name="api_key"></string>-->
 
     <string name="app_name">FinalPopularMovies</string>
 
